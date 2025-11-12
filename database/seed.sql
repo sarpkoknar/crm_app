@@ -53,7 +53,7 @@ VALUES (
     { "urun_id": 201, "adet": 1 }
   ]',
   250.00,
-  'Kredi Kartı',
+  'Kredi Karti',
   250.00,
   'EVET',
   'sarp@example.com'
