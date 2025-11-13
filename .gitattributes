@@ -1,0 +1,21 @@
+# Varsayılan olarak tüm dosyalar LF satır sonu ve UTF-8 encoding ile tutulacak
+* text=auto eol=lf working-tree-encoding=UTF-8
+
+# Windows batch dosyaları CRLF ile kalmalı
+*.bat text eol=crlf working-tree-encoding=Windows-1252
+
+# PowerShell scriptleri CRLF ile kalmalı
+*.ps1 text eol=crlf working-tree-encoding=UTF-8
+
+# Markdown ve dokümanlar LF + UTF-8
+*.md text eol=lf working-tree-encoding=UTF-8
+*.txt text eol=lf working-tree-encoding=UTF-8
+
+# SQL dosyaları LF + UTF-8
+*.sql text eol=lf working-tree-encoding=UTF-8
+
+# TypeScript ve JavaScript dosyaları LF + UTF-8
+*.ts text eol=lf working-tree-encoding=UTF-8
+*.tsx text eol=lf working-tree-encoding=UTF-8
+*.js text eol=lf working-tree-encoding=UTF-8
+*.jsx text eol=lf working-tree-encoding=UTF-8
