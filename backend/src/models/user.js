@@ -1,6 +1,6 @@
-// user.js
+// src/models/user.js
 const { DataTypes } = require('sequelize');
-const sequelize = require('../config/db'); // veritabanı bağlantısı
+const sequelize = require('../config/db'); // Veritabanı bağlantısı
 
 // User tablosunu tanımlıyoruz
 const User = sequelize.define('User', {
@@ -16,7 +16,10 @@ const User = sequelize.define('User', {
   email: {
     type: DataTypes.STRING,
     unique: true, // aynı email tekrar olamaz
-    allowNull: false
+    allowNull: false,
+    validate: {
+      isEmail: true // email format kontrolü
+    }
   },
   sifre_hash: {
     type: DataTypes.STRING,
@@ -32,7 +35,9 @@ const User = sequelize.define('User', {
   }
 }, {
   tableName: 'users',
-  timestamps: false // tabloya otomatik createdAt/updatedAt ekleme
+  timestamps: true, // createdAt ve updatedAt alanlarını otomatik ekler
+  underscored: true // alan adlarını snake_case yapar (created_at, updated_at)
 });
 
+// Modeli dışa aktarıyoruz
 module.exports = User;

@@ -1,36 +1,36 @@
 // src/App.tsx
-import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-
 import Login from './components/auth/Login';
 import UserLogins from './components/admin/UserLogins';
 import UserEdit from './components/admin/UserEdit';
 import UserList from './components/users/UserList';
 
 // Basit guard: token yoksa login'e yönlendir
-const RequireAuth = ({ children }: { children: React.ReactElement }) => {
+const RequireAuth = ({ children }: { children: JSX.Element }) => {
   const token = localStorage.getItem('token');
   return token ? children : <Navigate to="/" replace />;
 };
 
-const App: React.FC = () => {
+function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Login sayfası */}
+        {/* Giriş ekranı */}
         <Route path="/" element={<Login />} />
 
-        {/* Admin sayfaları */}
+        {/* Admin panelinde başarılı girişleri listeleme */}
         <Route
-          path="/admin/logins"
+          path="/admin/users"
           element={
             <RequireAuth>
               <UserLogins />
             </RequireAuth>
           }
         />
+
+        {/* Kullanıcı güncelleme formu */}
         <Route
-          path="/admin/edit"
+          path="/admin/users/:id/edit"
           element={
             <RequireAuth>
               <UserEdit />
@@ -47,9 +47,12 @@ const App: React.FC = () => {
             </RequireAuth>
           }
         />
+
+        {/* Tanımsız path'ler için fallback */}
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
   );
-};
+}
 
 export default App;
