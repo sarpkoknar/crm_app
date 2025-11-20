@@ -1,30 +1,14 @@
 const express = require('express');
 const router = express.Router();
 
-// db.js yine src/config altında
-const db = require('../src/config/db');
+// Controller ve Middleware'leri doğru adreslerden çağırıyoruz
+const userController = require('../src/controllers/userController');
+const { authenticateToken, authorizeRole } = require('../src/middleware/authMiddleware');
 
-// Tüm kullanıcıları listele
-router.get('/', async (req, res) => {
-  try {
-    const users = await db.getAllUsers();
-    res.json(users);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: 'Sunucu hatası' });
-  }
-});
-
-// Tek kullanıcı getir
-router.get('/:id', async (req, res) => {
-  try {
-    const user = await db.getUserById(req.params.id);
-    if (!user) return res.status(404).json({ message: 'Kullanıcı bulunamadı' });
-    res.json(user);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: 'Sunucu hatası' });
-  }
-});
+// Rotalar
+router.get('/', authenticateToken, authorizeRole(['admin']), userController.getAllUsers);
+router.post('/', authenticateToken, authorizeRole(['admin']), userController.createUser);
+router.put('/:id', authenticateToken, authorizeRole(['admin']), userController.updateUser);
+router.delete('/:id', authenticateToken, authorizeRole(['admin']), userController.deleteUser);
 
 module.exports = router;

@@ -1,19 +1,47 @@
-// userService.js
-const bcrypt = require('bcrypt');
+// Service katmanı: İş mantığını burası yönetir
 const User = require('../models/user');
+const bcrypt = require('bcryptjs');
 
-// Yeni kullanıcı kaydı
-async function registerUser({ ad, email, password, rol }) {
-  const sifre_hash = await bcrypt.hash(password, 10); // şifreyi hashle
-  return await User.create({ ad, email, sifre_hash, rol });
-}
+const userService = {
+  // Tüm kullanıcıları getir
+  getAllUsers: async () => {
+    // User modelindeki SQL fonksiyonunu çağırır
+    return await User.findAll();
+  },
 
-// Kullanıcı giriş kontrolü
-async function loginUser(email, password) {
-  const user = await User.findOne({ where: { email } });
-  if (!user) return null;
-  const match = await bcrypt.compare(password, user.sifre_hash);
-  return match ? user : null;
-}
+  // Yeni kullanıcı oluştur
+  createUser: async (userData) => {
+    // Şifreyi hashle
+    const hashedPassword = await bcrypt.hash(userData.sifre, 10);
+    
+    // Hashlenmiş şifre ile kaydet
+    return await User.create({
+      ...userData,
+      sifre_hash: hashedPassword
+    });
+  },
 
-module.exports = { registerUser, loginUser };
+  // Kullanıcı güncelle
+  updateUser: async (id, userData) => {
+    // Eğer şifre değişiyorsa onu da hashle
+    if (userData.sifre) {
+      userData.sifre_hash = await bcrypt.hash(userData.sifre, 10);
+      delete userData.sifre; // Ham şifreyi veritabanına gönderme
+    }
+    
+    // Güncelleme (id'yi where şartı olarak gönderiyoruz)
+    return await User.update(userData, { where: { id } });
+  },
+
+  // Kullanıcı sil
+  deleteUser: async (id) => {
+    return await User.destroy({ where: { id } });
+  },
+
+  // Login için kullanıcı bul
+  getUserByEmail: async (email) => {
+    return await User.findOne({ where: { email } });
+  }
+};
+
+module.exports = userService;

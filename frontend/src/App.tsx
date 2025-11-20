@@ -1,55 +1,35 @@
-// src/App.tsx
 import React from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'; // Router'ı buradan alıyoruz
 import Login from './components/auth/Login';
-import UserLogins from './components/admin/UserLogins';
-import UserEdit from './components/admin/UserEdit';
-import UserList from './components/users/UserList';
+import UserList from './components/users/UserList'; 
 
-// Basit guard: token yoksa login'e yönlendir
-const RequireAuth = ({ children }: { children: React.ReactElement }) => {
-  const token = localStorage.getItem('token');
-  return token ? children : <Navigate to="/" replace />;
-};
+function App() {
+  // Token kontrolü
+  const isAuthenticated = !!localStorage.getItem('token');
 
-const App: React.FC = () => {
   return (
-    <BrowserRouter>
-      <Routes>
-        {/* Login sayfası */}
-        <Route path="/" element={<Login />} />
+    // DÜZELTME: Tüm uygulamayı <Router> etiketiyle sarmaladık. Hata buydu.
+    <Router>
+      <div className="container mx-auto p-4">
+        <Routes>
+          {/* 1. Giriş Sayfası */}
+          <Route path="/login" element={<Login />} />
 
-        {/* Admin sayfaları */}
-        <Route
-          path="/admin/logins"
-          element={
-            <RequireAuth>
-              <UserLogins />
-            </RequireAuth>
-          }
-        />
-        <Route
-          path="/admin/edit"
-          element={
-            <RequireAuth>
-              <UserEdit />
-            </RequireAuth>
-          }
-        />
+          {/* 2. Ana Sayfa Yönlendirmesi */}
+          <Route 
+            path="/" 
+            element={isAuthenticated ? <Navigate to="/users" /> : <Navigate to="/login" />} 
+          />
 
-        {/* Kullanıcı listesi */}
-        <Route
-          path="/users"
-          element={
-            <RequireAuth>
-              <UserList />
-            </RequireAuth>
-          }
-        />
-      </Routes>
-    </BrowserRouter>
+          {/* 3. Kullanıcı Listesi */}
+          <Route 
+            path="/users" 
+            element={isAuthenticated ? <UserList /> : <Navigate to="/login" />} 
+          />
+        </Routes>
+      </div>
+    </Router>
   );
-};
+}
 
 export default App;

@@ -1,25 +1,20 @@
-// src/config/db.js
-const { Sequelize } = require('sequelize');
+const { Pool } = require('pg');
+require('dotenv').config();
 
-// PostgreSQL bağlantısı
-const sequelize = new Sequelize('crm_db', 'postgres', '22001010', {
-  host: 'localhost',
-  dialect: 'postgres',
-  logging: false, // SQL loglarını kapatır
+// .env dosyasındaki bilgileri kullanarak ayarları yapıyoruz
+const pool = new Pool({
+  user: process.env.DB_USER,
+  host: process.env.DB_HOST,
+  database: process.env.DB_NAME,
+  password: process.env.DB_PASSWORD,
+  port: process.env.DB_PORT,
 });
 
-// Bağlantıyı test et
-sequelize.authenticate()
-  .then(() => console.log('✅ Veritabanına başarıyla bağlandı'))
-  .catch(err => console.error('❌ Veritabanı bağlantı hatası:', err));
+// Bağlantı hatası olursa konsola bas (Server çökmesin)
+pool.on('error', (err) => {
+  console.error('Beklenmedik veritabanı hatası:', err);
+  process.exit(-1);
+});
 
-// --- Fonksiyonlar ---
-async function getUserByEmail(email) {
-  const [rows] = await sequelize.query(
-    'SELECT id, ad, email, sifre_hash, rol FROM users WHERE email = :email LIMIT 1',
-    { replacements: { email } }
-  );
-  return rows[0] || null;
-}
-
-module.exports = { sequelize, getUserByEmail };
+// Pool nesnesini doğrudan dışarı aktarıyoruz
+module.exports = pool;

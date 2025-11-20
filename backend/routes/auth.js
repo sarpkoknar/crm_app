@@ -1,49 +1,62 @@
 const express = require('express');
 const router = express.Router();
-const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
+const userService = require('../src/services/userService'); 
 
-// db.js src/config altında olduğu için path böyle
-const { getUserByEmail } = require('../src/config/db');
-
-// Login endpoint
+// GİRİŞ YAP (LOGIN) - DEBUG MODU
 router.post('/login', async (req, res) => {
   const { email, password } = req.body;
 
-  // Basit input doğrulama
-  if (!email || !password) {
-    return res.status(400).json({ message: 'Email ve şifre zorunlu' });
-  }
+  console.log(`\n--- GİRİŞ DENEMESİ: ${email} ---`);
 
   try {
-    // Kullanıcıyı DB’den çek
-    const user = await getUserByEmail(email);
+    // 1. Kullanıcıyı Bul
+    const user = await userService.getUserByEmail(email);
+    
     if (!user) {
-      return res.status(401).json({ message: 'Kullanıcı bulunamadı' });
+      console.log("❌ HATA: Kullanıcı veritabanında bulunamadı!");
+      return res.status(400).json({ message: 'Kullanıcı bulunamadı' });
     }
+    console.log("✅ Kullanıcı bulundu:", user.email);
+    console.log("🔍 DB'deki Şifre Hash:", user.sifre_hash);
 
-    // Şifre kontrolü
-    const ok = await bcrypt.compare(password, user.sifre_hash);
-    if (!ok) {
-      return res.status(401).json({ message: 'Şifre hatalı' });
+    // 2. Şifreyi Kontrol Et
+    const validPassword = await bcrypt.compare(password, user.sifre_hash);
+    
+    if (!validPassword) {
+      console.log("❌ HATA: Şifre eşleşmedi!");
+      return res.status(400).json({ message: 'Şifre hatalı' });
     }
+    console.log("✅ Şifre doğrulandı.");
 
-    // Token üret
+    // 3. Token Oluştur
     const token = jwt.sign(
-      { id: user.id, email: user.email, role: user.rol },
-      process.env.JWT_SECRET || 'supersecret',
-      { expiresIn: '1h' }
+      { 
+        id: user.id, 
+        email: user.email, 
+        rol: user.rol 
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: '24h' }
     );
 
-    // Başarılı yanıt
-    return res.json({
+    console.log("✅ Token üretildi. Giriş Başarılı.\n");
+
+    res.json({
       token,
-      role: user.rol,
-      user: { id: user.id, ad: user.ad, email: user.email }
+      user: {
+        id: user.id,
+        ad: user.ad,
+        email: user.email,
+        rol: user.rol
+      },
+      role: user.rol
     });
-  } catch (err) {
-    console.error('❌ Auth error:', err);
-    return res.status(500).json({ message: 'Sunucu hatası' });
+
+  } catch (error) {
+    console.error("🔥 KRİTİK HATA:", error);
+    res.status(500).json({ message: 'Sunucu hatası', error: error.message });
   }
 });
 
