@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'; // Router'ı buradan alıyoruz
 import Login from './components/auth/Login';
 import UserList from './components/users/UserList'; 
+import UserForm from './components/users/UserForm';
 
 function App() {
   // Token kontrolü
@@ -25,6 +26,12 @@ function App() {
           <Route 
             path="/users" 
             element={isAuthenticated ? <UserList /> : <Navigate to="/login" />} 
+          />
+
+          {/* Yeni Kullanıcı Ekleme Sayfası */}
+          <Route 
+            path="/users/new" 
+            element={isAuthenticated ? <UserForm /> : <Navigate to="/login" />} 
           />
         </Routes>
       </div>
