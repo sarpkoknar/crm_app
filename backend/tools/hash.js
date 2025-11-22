@@ -1,5 +1,5 @@
 // tools/hash.js
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 
 (async () => {
   const plain = '123456';

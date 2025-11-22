@@ -103,7 +103,11 @@ const UserList: React.FC = () => {
                       )}
                     </td>
                     <td className="px-5 py-5 border-b border-gray-200 bg-white text-sm text-center">
-                      <button className="text-blue-600 hover:text-blue-900 mr-3 text-xs font-bold">DÜZENLE</button>
+                      <button 
+                        onClick={() => navigate(`/users/edit/${user.id}`)} // <-- ID'yi rotaya ekleyerek gönderiyoruz
+                        className="text-blue-600 hover:text-blue-900 mr-3 text-xs font-bold">
+                        DÜZENLE
+                      </button>
                       
                       {/* SİL BUTONU ARTIK ÇALIŞIYOR */}
                       <button 

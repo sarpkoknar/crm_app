@@ -33,6 +33,11 @@ function App() {
             path="/users/new" 
             element={isAuthenticated ? <UserForm /> : <Navigate to="/login" />} 
           />
+          {/* :id kısmı, düzenlenecek kullanıcının kimliğini taşıyacak */}
+          <Route 
+            path="/users/edit/:id" 
+            element={isAuthenticated ? <UserForm /> : <Navigate to="/login" />} 
+          />
         </Routes>
       </div>
     </Router>
